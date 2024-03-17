@@ -1,50 +1,52 @@
-import apiData from '../../api.json';
+import emp_data from '../../emp.json';
 
 export const config = [
+    {
+        accessor: 'id',
+        header: 'EmpID',
+        canSort: true,
+    },
     {
         accessor: 'name',
         header: "Name",
         canSort: true,
     },
     {
-        accessor: 'category',
-        header: "Category",
+        accessor: 'team_id',
+        header: "Team",
         canSort: true,
     }, 
     {
-        accessor: 'description',
-        header: "Description",
+        accessor: 'role',
+        header: "Role",
         canSort: true,
     }, 
     {
-        accessor: 'expiry',
-        header: "Expiry",
+        accessor: 'date_of_joining',
+        header: "D.O.J",
         canSort: true,
         isDateColumn: "YYYY-MM-DD",
     }, 
     {
-       header: 'Selling Price',
-        accessor: "sp",
+       header: 'Project',
+        accessor: "project_id",
         canSort: true,
     },
     {
-        header: 'Discount',
-        accessor: "discount_percentage",
-        canSort: true,
+        header: 'Mail ID',
+        accessor: "presonal_mail_id",
     }, 
     {
-        accessor: 'cp',
-        header: "Cost Price",
-        canSort: true,
+        accessor: 'phone_number',
+        header: "Phone number",
     },
     {
-        accessor: 'final_price',
-        header: "Final Amount in INR",
-        canSort: true,
+        accessor: "secondary_phone_number",
+        header: "Secondary Ph.no",
     }
 ];
 
 
 export function getApiData() {
-    return apiData;
+    return emp_data;
  }

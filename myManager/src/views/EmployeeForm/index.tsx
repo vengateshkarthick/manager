@@ -179,7 +179,7 @@ function CreateOrEditEmployee() {
             <Dropdown
               onSelect={(opt) => handleCategory(opt)}
               options={filterOptions}
-              selected={formData?.team_name || []}
+              selected={formData?.team_id || []}
               key="category"
               size="sm"
               isMultiSelect={false}

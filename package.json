@@ -1,0 +1,11 @@
+{
+  "name": "Manager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/vengateshkarthick/manager",
+  "author": "VengateshGV <53400321+vengateshkarthick@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "vite": "^5.1.6"
+  }
+}

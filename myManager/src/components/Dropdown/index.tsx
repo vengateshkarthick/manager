@@ -14,6 +14,7 @@ function Dropdown({
   label,
   size = "md",
   className = " ",
+  dropDownClassName = " ",
 }: IDropdown) {
   const [selectedOption, setSelectedOption] = useState<
     { id: string; label: string }[]
@@ -90,7 +91,7 @@ function Dropdown({
 
       {isDropdownOpen && (
         <div
-          className="absolute h-48 z-20 overflow-y-auto top-10 flex flex-col gap-2 justify-start py-2 items-center w-full rounded-md shadow-2xl bg-white ring-black ring-opacity-5"
+          className={`absolute h-48 z-20 overflow-y-auto top-10 flex flex-col gap-2 justify-start py-2 items-center w-full rounded-md shadow-2xl bg-white ring-black ring-opacity-5 ${dropDownClassName}`}
           role="menu"
           // style={dropdownPosition}
         >

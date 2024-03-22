@@ -176,7 +176,7 @@ function CreateOrEditEmployee() {
             value={name.firstname || ""}
             required
             className="w-4/5"
-            placeholder="name"
+            placeholder=" "
             label="First Name"
           />
           <TextInput
@@ -188,7 +188,7 @@ function CreateOrEditEmployee() {
             value={name.middlename || ""}
             required
             className="w-4/5"
-            placeholder="name"
+            placeholder=" "
             label="Middle Name"
           />
           <TextInput
@@ -200,7 +200,7 @@ function CreateOrEditEmployee() {
             value={name.lastname || ""}
             required
             className="w-4/5"
-            placeholder="name"
+            placeholder=" "
             label="Last Name"
           />
         </div>
@@ -212,7 +212,7 @@ function CreateOrEditEmployee() {
           <input
             name="email_id"
             key="email_id"
-            type="text"
+            type="email"
             onChange={(e) =>
               handleFormChange("personal_email_id", e.target.value)
             }
@@ -220,7 +220,7 @@ function CreateOrEditEmployee() {
             className="p-2 rounded border-2 text-sm placeholder:text-[#767D83] focus:border-blue-700"
           />
         </div>
-        <div className="flex  items-center justify-start w-full gap-4">
+        <div className="flex  items-center justify-start w-full gap-5">
           <div className="flex flex-col gap-5 items-start justify-start h-full">
             <div className="font-normal text-left text-sm font-[Poppins]">
               Select Team
@@ -232,16 +232,15 @@ function CreateOrEditEmployee() {
               key="team_id"
               size="sm"
               isMultiSelect={false}
+              dropDownClassName="w-[500px]"
             />
           </div>
 
-          
-            <CalendarPicker
-              date={formData?.date_of_joining}
-              onSelect={(date) => handleFormChange("date_of_joining", date)}
-              label="Date of Joining"
-            />
-         
+          <CalendarPicker
+            date={formData?.date_of_joining}
+            onSelect={(date) => handleFormChange("date_of_joining", date)}
+            label="Date of Joining"
+          />
         </div>
 
         <div className="h-auto w-full flex justify-start items-center flex-wrap gap-5">
@@ -253,7 +252,7 @@ function CreateOrEditEmployee() {
             // inputMode="numeric"
             onKeyDown={handleOnlyNumerics}
             required
-            label="Primary phone number"
+            label="Primary number"
             placeholder=""
           />
 
@@ -267,18 +266,20 @@ function CreateOrEditEmployee() {
             // inputMode="numeric"
             onKeyDown={handleOnlyNumerics}
             required
-            label="Secondary phone number"
+            label="Secondary number"
             placeholder=""
           />
         </div>
-
-        <Button
-          label={selectedemp?.id ? "Update" : "Save"}
-          onClick={() => {}}
-          isSubmitBtn
-          variant="filled"
-          code="primary"
-        />
+        <div className="w-full">
+          <Button
+            label={selectedemp?.id ? "Update" : "Save"}
+            onClick={() => {}}
+            isSubmitBtn
+            variant="filled"
+            code="primary"
+            className="w-full"
+          />
+        </div>
       </form>
     </div>
   );

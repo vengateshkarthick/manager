@@ -8,5 +8,6 @@ export interface IDropdown {
     label?:string;
     size?: IButton['size'];
     className?:string;
+    dropDownClassName?:string;
 }
   

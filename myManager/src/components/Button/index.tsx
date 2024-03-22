@@ -7,7 +7,7 @@ const constructStyles = ({
   disabled = false,
   code = "primary",
   size = "sm",
-  noTranistion,
+  className,
 }: Partial<IButton>) => {
   const pad = {
     xs: 2,
@@ -43,7 +43,7 @@ const constructStyles = ({
     },
   };
 
-  return `${button_variants[code][variant]} ${common} ${
+  return `${button_variants[code][variant]} ${common} ${className} ${
     disabled ? "opacity-50 cursor-not-allowed" : "opacity-100"
   }  `;
 };

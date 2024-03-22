@@ -105,13 +105,24 @@ function List(props: IList) {
         <>
           {withActionItem.map(({ accessor, rowClassName, render }) => {
             return (
-              <div
-                className={`p-2 w-full font-normal text-slate-500 text-left h-10 truncate text-sm ${rowClassName}`}
+              <div className={`relative flex justify-center items-start text-left flex-col ${rowClassName}`}>
+                <div
+                className={`p-2 w-full font-normal text-slate-500 text-left h-10 truncate text-sm  `}
                 id={id}
+                
               >
                 {render?.(row as IEmpData, { rowIdx: idx.toString() }) ||
                   row?.[accessor as keyof typeof row]}
+                {/*
+                  need to add tooltip
+                 <article className="absolute invisible hover:visible bg-[#fff] border rounded z-30  w-full text-xs p-1">
+                 {!render && row?.[accessor as keyof typeof row]}
+                </article> */}
+                </div>
               </div>
+              
+             
+              
             );
           })}
         </>
@@ -158,7 +169,7 @@ function List(props: IList) {
 
   return (
     <div
-      className={`relative grid grid-cols-10 w-full items-start justify-center border-2 rounded-md border-[#fbfcfe] h-[200] max-h-[50vh] overflow-y-auto ${className} cursor-pointer hover:[&>img]:block bg-[#fbfcfe]`}
+      className={`relative grid grid-cols-${config.length + 2} w-full items-start justify-center border-2 rounded-md border-[#fbfcfe] h-[200] max-h-[50vh] overflow-y-auto ${className} cursor-pointer hover:[&>img]:block bg-[#fbfcfe]`}
       id={id}
     >
       {/* render header with selectable functionality */}

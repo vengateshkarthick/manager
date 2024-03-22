@@ -2,7 +2,7 @@ export interface IEmpData  {
     id: string;
     name: string;
     role: string;
-    team_name: string;
+    team_id: string;
     project_id: string;
     personal_mail_id: string;
     phone_number: string;

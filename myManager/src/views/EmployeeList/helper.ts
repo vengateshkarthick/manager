@@ -34,16 +34,16 @@ export const config = [
     },
     {
         header: 'Mail ID',
-        accessor: "presonal_mail_id",
+        accessor: "personal_mail_id",
     }, 
     {
         accessor: 'phone_number',
         header: "Phone number",
     },
-    {
-        accessor: "secondary_phone_number",
-        header: "Secondary Ph.no",
-    }
+    // {
+    //     accessor: "secondary_phone_number",
+    //     header: "Secondary Ph.no",
+    // }
 ];
 
 

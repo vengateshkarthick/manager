@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { IButton } from './type'
 
 const constructStyles = ({
@@ -44,12 +45,14 @@ const constructStyles = ({
 
   return `${button_variants[code][variant]} ${common} ${
     disabled ? "opacity-50 cursor-not-allowed" : "opacity-100"
-  } ${disabled || noTranistion   ? " " : "transition ease-in-out delay-150 hover:scale-110"} `;
+  }  `;
 };
 function Button(props: IButton) {
   return (
-    <div className="h-auto w-auto">
-      <button
+    <motion.div className="h-auto w-auto">
+      <motion.button
+        whileTap={{ scale: props.disabled ? 1 : 0.975 }}
+        whileHover={{ scale: props.disabled ? 1 : 1.025 }}
         className={constructStyles(props)}
         disabled={props.disabled}
         onClick={(e) => {
@@ -63,8 +66,8 @@ function Button(props: IButton) {
           {props.label && <div className="text-sm truncate w-[100px] max-w-[100px]">{props.label}</div>}
           {props.icon && <img src={props.icon} height={15} width={15} alt="btn-icon"/>}
         </div>
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }
 

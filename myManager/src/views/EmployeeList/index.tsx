@@ -64,7 +64,7 @@ function EmpList() {
         onClose={() => setShowModal(false)}
         open={showModal}
         handleConfirm={handleConfirm}
-        header="Please confirm to delete the selected records..."
+        header="Please confirm!! the employee details will be premanantely deleted.."
       />
     </div>
   );

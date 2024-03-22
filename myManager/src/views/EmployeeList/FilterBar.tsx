@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "../../components/Button";
 import Dropdown from "../../components/Dropdown";
-import { catogeries } from "../../shared/constants/categories";
+import { team_id } from "../../shared/constants/categories";
 import TextArea from "../../components/TextInput";
 import { IEmpData } from "../../shared/list.type";
 
@@ -21,7 +21,7 @@ function FilterBar({
 }) {
 
   const hasChanges = React.useRef<boolean>();
-  const filterOptions = React.useMemo(() => catogeries, []);
+  const filterOptions = React.useMemo(() => team_id, []);
   const [searchText, setSearchText] = React.useState<string>("");
   const [filter, setFilter] = React.useState<
     { id: string; label: string }[] | null
@@ -46,13 +46,13 @@ function FilterBar({
 
     if (searchText.length) {
       filteredData = filteredData.filter((pdt) =>
-        pdt.name.includes(searchText)
+        pdt.id.includes(searchText)
       );
     }
 
     if (ctgIds && ctgIds.length) {
       filteredData = filteredData.filter((pdt) =>
-        ctgIds.includes(pdt.team_name.toLowerCase())
+        ctgIds.includes(pdt.team_id.toLowerCase())
       );
     }
 
@@ -73,25 +73,25 @@ function FilterBar({
   }
 
   return (
-    <div className="my-2 h-28 w-full p-2 flex justify-between items-center border-1 rounded-md border-amber-200 ">
-      <div className="w-[70%] flex justify-start gap-4 items-center">
+    <div className="my-2 h-28 w-full p-2 flex  justify-between items-center border-1 rounded-md border-amber-200 ">
+      <div className="w-auto grid grid-cols-3 justify-start gap-4 items-center">
         <TextArea
           value={searchText}
           onTextInputChange={(val) => setSearchText(val)}
-          placeholderText="Search with product name..."
-          className="w-[25%]"
+          placeholderText="Search with empid..."
+          className="col-span-3"
         />
         <Dropdown
           onSelect={(selectedOpt) => setFilter(() => selectedOpt)}
           options={filterOptions}
           isMultiSelect
           selected={filter}
-          label="Filter by Category"
+          label="Filter by Team"
           size="sm"
         />
         <Button
-          code="primary"
-          variant="filled"
+          code="success"
+          variant="outlined"
           onClick={() => handleApply()}
           label="Apply"
           disabled={!filter?.length && !searchText.length}
@@ -99,7 +99,7 @@ function FilterBar({
         />
 
         <Button
-          code="danger"
+          code="primary"
           variant="filled"
           onClick={onClearFilterData}
           label="Clear Filters"
@@ -108,7 +108,7 @@ function FilterBar({
         />
       </div>
 
-      <div className="flex justify-end items-center gap-4 mx-1 w-[20%]">
+      <div className="flex justify-end items-end gap-4 mx-1 w-full md:w-[20%] h-full">
         <Button
           code="danger"
           variant="filled"

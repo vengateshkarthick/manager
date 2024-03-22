@@ -8,7 +8,7 @@ export interface IListConfig {
   render?: (data: IListData, customProperties?: any) => React.ReactNode | string | null;
   canSort?: boolean;
   hasFilter?: boolean;
-  rowClassName?: string; 
+  rowClassName?: string;
   isDateColumn?: "YYYY-MM-DD",
 }
 

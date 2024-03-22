@@ -26,7 +26,7 @@ function ConfirmationModal({
               width={20}
             />
           </button> */}
-          <div className="text-sm font-normal w-full text-left truncate my-3 text-emerald-400">{header}</div>
+          <div className="text-sm font-normal w-full text-left text-balance my-3 text-emerald-400">{header}</div>
           {subText && <div className="text-sm text-emerald-400">{subText}</div>}
           <div className="relative flex justify-end gap-4 w-full my-3">
             <Button 

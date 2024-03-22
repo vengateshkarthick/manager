@@ -13,6 +13,7 @@ function Dropdown({
   isMultiSelect = false,
   label,
   size = "md",
+  className = " ",
 }: IDropdown) {
   const [selectedOption, setSelectedOption] = useState<
     { id: string; label: string }[]
@@ -70,7 +71,7 @@ function Dropdown({
     }
   }, [btnRef?.current]);
   return (
-    <div className="relative inline-block text-left w-auto" ref={ref}>
+    <div className={`relative inline-block text-left w-auto ${className}`} ref={ref}>
       
       <div className="h-6 w-full flex justify-start gap-2 items-center" ref={btnRef}>
       {label && (

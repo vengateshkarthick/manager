@@ -7,5 +7,6 @@ export interface IDropdown {
     selected: Array<{id: string, label: string}> | null;
     label?:string;
     size?: IButton['size'];
+    className?:string;
 }
   

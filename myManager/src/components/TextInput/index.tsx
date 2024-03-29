@@ -1,4 +1,5 @@
 import React from 'react';
+import { twMerge } from 'tailwind-merge';
 import { ITextArea } from "./type";
 
 
@@ -10,6 +11,7 @@ function TextArea({
   placeholderText = 'search with product name...',
   label = "",
   height,
+  error = "",
   ...rest
 }: ITextArea & React.InputHTMLAttributes<Omit<HTMLInputElement, "date">>) {
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -19,7 +21,7 @@ function TextArea({
    onTextInputChange(currentValue);
   };
   return (
-    <div className={`grid grid-cols-1 items-center justify-start w-auto gap-2 ${className}`}>
+    <div className={twMerge("grid grid-cols-1 items-center justify-start w-auto gap-2", className)}>
     {label && (
         <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap">{label}</div>
       )}
@@ -37,6 +39,7 @@ function TextArea({
       />
      
     </div>
+    { error?.length && <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap">{error}</div>}
     </div>
   );
 }

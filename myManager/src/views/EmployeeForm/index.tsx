@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { addemp, fetchempDetails, updateemp } from "../../reducer/store";
 import Button from "../../components/Button";
 import TextInput from "../../components/TextInput";
@@ -10,6 +13,29 @@ import { team_id, roles } from "../../shared/constants/categories";
 import addProductIcon from "../../assets/formImg.svg";
 import { toast } from "react-toastify";
 import { productKeys } from "../../components/Table/type";
+import { IEmpData } from "../../shared/list.type";
+
+const empDetailsSchema = z
+  .object({
+    id: z.string().optional(),
+    phone_nunber: z.string(),
+    personal_mail_id: z.string().email({ message: "Enter a valid email id" }),
+    firstname: z.string().nonempty({ message: "Enter your first name" }),
+    middlename: z.string().optional(),
+    lastname: z.string().optional(),
+    secondary_phone_number: z.string().default("000 000 000"),
+    date_of_joining: z
+      .string()
+      .datetime({ message: "Select a starting date of employee" }),
+    role: z.array(z.object({ id: z.string(), label: z.string() })),
+    team_id: z.array(z.object({ id: z.string(), label: z.string() })),
+    currentEmployee: z.string().default("Yes").optional(),
+    date_of_releving: z.string().datetime().optional(),
+  })
+  .required()
+  .refine((val) => val.secondary_phone_number !== val.phone_nunber, {
+    message: "The primary phone number and secondary number cannot be the same",
+  });
 
 const requiredFields = [
   "phone_number",
@@ -19,12 +45,26 @@ const requiredFields = [
   "date_of_joining",
   "role",
   "project_id",
-  "team_name",
+  "team_id",
 ];
 
 // TODO: need to configure team_name, project_id and role dropdown properly
 function CreateOrEditEmployee() {
-  const { selectedemp } = useSelector((state: any) => state?.employee) as any;
+  const { selectedemp } = useSelector((state: any) => state?.employee) as {
+    selectedemp: IEmpData;
+  };
+  const {
+    handleSubmit,
+    formState: { errors, isDirty, isValid },
+    watch,
+    setValue,
+    reset,
+    control,
+    getValues,
+  } = useForm<z.infer<typeof empDetailsSchema>>({
+    mode: "onSubmit",
+    resolver: zodResolver(empDetailsSchema),
+  });
   const [name, setName] = useState({
     firstname: "",
     lastname: "",
@@ -44,7 +84,11 @@ function CreateOrEditEmployee() {
   }, [id]);
 
   React.useEffect(() => {
-    if ((selectedemp?.id as string) && teamOptions.length) {
+    if (
+      (selectedemp?.id as string) &&
+      teamOptions.length &&
+      roleOptions.length
+    ) {
       const { team_id, name, role, ...rest } = selectedemp;
       const [firstname, middlename, lastname] = name.split(" ");
 
@@ -54,15 +98,24 @@ function CreateOrEditEmployee() {
       const _roleOpt = roleOptions.find(
         (opt) => opt.id.toLowerCase() === role.toLowerCase()
       );
-
-      setName(() => ({ firstname, middlename, lastname }));
-      setFormData(() => ({
-        team_id: ctg ? [ctg] : [],
-        role: _roleOpt,
-        ...rest,
-      }));
+      setValue("firstname", firstname, { shouldDirty: false }),
+        setValue("lastname", lastname, { shouldDirty: false }),
+        setValue("middlename", middlename, { shouldDirty: false }),
+        reset({
+          firstname,
+          lastname,
+          role: [_roleOpt],
+          team_id: [ctg],
+          personal_mail_id: rest?.personal_mail_id,
+          phone_nunber: rest?.phone_number,
+          secondary_phone_number: rest?.secondary_phone_number || "000 000 000",
+          date_of_joining: rest?.date_of_joining,
+          currentEmployee: rest?.currentEmployee,
+          date_of_releving: rest?.date_of_reliving,
+          id: rest?.id,
+        });
     }
-  }, [selectedemp, teamOptions]);
+  }, [selectedemp, teamOptions, roleOptions]);
 
   const onCreateEmployee = (payload: any) => {
     toast("Congratulations on new hire", {
@@ -86,31 +139,18 @@ function CreateOrEditEmployee() {
     navigate("/home", { replace: true });
   };
 
-  const createPayload = (data: any) => {
+  const createPayload = (_: any) => {
+    const values = getValues();
     return {
-      ...formData,
-      team_id: data.team_id?.[0]?.id,
-      name: name.firstname + name.middlename + name.lastname,
-      role: data.role[0]?.label,
+      ...values,
+      team_id: values.team_id?.[0]?.id,
+      name: values.firstname + values.middlename + values.lastname,
+      role: values.role[0]?.label,
     };
   };
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    const isValid = requiredFields.every((field) =>
-      Boolean(formData?.[field as productKeys])
-    );
-
-    if (!isValid) {
-      toast("Please fill all the detials ...", {
-        position: "top-right",
-        type: "error",
-        theme: "light",
-        autoClose: 1000,
-      });
-
-      return;
-    } else {
-      e?.preventDefault();
+  const onSubmit = () => {
+    if (isValid) {
       const payload = createPayload(formData);
       if (id === "create") {
         onCreateEmployee(payload);
@@ -127,13 +167,13 @@ function CreateOrEditEmployee() {
     }));
   };
 
-  const handleTeam = (team: { id: string; label: string }[]) => {
-    handleFormChange("team_id", team);
-  };
+  // const handleTeam = (team: { id: string; label: string }[]) => {
+  //   handleFormChange("team_id", team);
+  // };
 
-  const handleRole = (role: { id: string; label: string }[]) => {
-    handleFormChange("role", role);
-  };
+  // const handleRole = (role: { id: string; label: string }[]) => {
+  //   handleFormChange("role", role);
+  // };
 
   const handleOnlyNumerics: React.KeyboardEventHandler<
     Omit<HTMLInputElement, "date">
@@ -161,47 +201,66 @@ function CreateOrEditEmployee() {
       </div>
       <form
         className="form w-[65%] flex flex-col gap-6 items-start justify-start h-full overflow-y-auto p-4"
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
       >
         <div className="font-normal text-left text-xl font-[Poppins]">
           {id !== "create" ? "Edit the emp details..." : "Add new employee..."}
         </div>
         <div className="flex justify-start items-center gap-4">
-          <TextInput
-            name="name"
-            key="name"
-            onTextInputChange={(val) =>
-              setName((prev) => ({ ...prev, firstname: val }))
-            }
-            value={name.firstname || ""}
-            required
-            className="w-4/5"
-            placeholder=" "
-            label="First Name"
+          <Controller
+            name="firstname"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <TextInput
+                name="firstname"
+                key="firstname"
+                onTextInputChange={(val) => onChange(val)}
+                error={error?.message}
+                value={value || ""}
+                required
+                className="w-4/5"
+                placeholder=" "
+                label="First Name"
+              />
+            )}
           />
-          <TextInput
-            name="name"
-            key="name"
-            onTextInputChange={(val) =>
-              setName((prev) => ({ ...prev, middlename: val }))
-            }
-            value={name.middlename || ""}
-            required
-            className="w-4/5"
-            placeholder=" "
-            label="Middle Name"
+
+          <Controller
+            name="middlename"
+            control={control}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <TextInput
+                name="middlename"
+                key="middlename"
+                onTextInputChange={(val) => onChange(val)}
+                error={error?.message}
+                value={value || ""}
+                required
+                className="w-4/5"
+                placeholder=" "
+                label="Middle Name"
+              />
+            )}
           />
-          <TextInput
-            name="name"
-            key="name"
-            onTextInputChange={(val) =>
-              setName((prev) => ({ ...prev, lastname: val }))
-            }
-            value={name.lastname || ""}
-            required
-            className="w-4/5"
-            placeholder=" "
-            label="Last Name"
+
+          <Controller
+            name="lastname"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <TextInput
+                name="lastname"
+                key="lasttname"
+                onTextInputChange={(val) => onChange(val)}
+                error={error?.message}
+                value={value || ""}
+                required
+                className="w-4/5"
+                placeholder=" "
+                label="Last Name"
+              />
+            )}
           />
         </div>
 
@@ -209,65 +268,131 @@ function CreateOrEditEmployee() {
           <div className="font-normal text-left text-sm font-[Poppins] my-2">
             Enter email
           </div>
-          <input
-            name="email_id"
-            key="email_id"
-            type="email"
-            onChange={(e) =>
-              handleFormChange("personal_email_id", e.target.value)
-            }
-            placeholder="Enter email id"
-            className="p-2 rounded border-2 text-sm placeholder:text-[#767D83] focus:border-blue-700"
+          <Controller
+            name="personal_mail_id"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <input
+                name="email_id"
+                key="email_id"
+                type="email"
+                onChange={(e) => onChange(e.target.value)}
+                value={value}
+                placeholder="Enter email id"
+                className="p-2 rounded border-2 text-sm placeholder:text-[#767D83] focus:border-blue-700"
+              />
+            )}
           />
+          {errors?.personal_mail_id?.message && (
+            <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap my-1">
+              {errors.personal_mail_id.message}
+            </div>
+          )}
         </div>
         <div className="flex  items-center justify-start w-full gap-5">
           <div className="flex flex-col gap-5 items-start justify-start h-full">
             <div className="font-normal text-left text-sm font-[Poppins]">
               Select Team
             </div>
-            <Dropdown
-              onSelect={(opt) => handleTeam(opt)}
-              options={teamOptions}
-              selected={formData?.team_id || []}
-              key="team_id"
-              size="sm"
-              isMultiSelect={false}
-              dropDownClassName="w-[500px]"
+            <Controller
+              name="team_id"
+              rules={{ required: true }}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <Dropdown
+                  onSelect={(opt) => onChange(opt)}
+                  options={teamOptions}
+                  selected={value || []}
+                  key="team_id"
+                  size="sm"
+                  isMultiSelect={false}
+                  dropDownClassName="w-[500px]"
+                  error={error?.message}
+                />
+              )}
+            />
+          </div>
+          <div className="flex flex-col gap-5 items-start justify-start h-full">
+            <div className="font-normal text-left text-sm font-[Poppins]">
+              Select Role
+            </div>
+            <Controller
+              name="role"
+              rules={{ required: true }}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <Dropdown
+                  onSelect={(opt) => onChange(opt)}
+                  options={teamOptions}
+                  selected={value || []}
+                  key="role"
+                  size="sm"
+                  isMultiSelect={false}
+                  dropDownClassName="w-[500px]"
+                  error={error?.message}
+                />
+              )}
             />
           </div>
 
-          <CalendarPicker
-            date={formData?.date_of_joining}
-            onSelect={(date) => handleFormChange("date_of_joining", date)}
-            label="Date of Joining"
+          <Controller
+            name="date_of_joining"
+            rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <CalendarPicker
+                date={value}
+                onSelect={(date) => onChange(date)}
+                label="Date of Joining"
+                error={error?.message}
+              />
+            )}
           />
         </div>
 
-        <div className="h-auto w-full flex justify-start items-center flex-wrap gap-5">
-          <TextInput
-            name=""
-            key="phone_number"
-            onTextInputChange={(val) => handleFormChange("phone_number", val)}
-            value={formData?.phone_number || ""}
-            // inputMode="numeric"
-            onKeyDown={handleOnlyNumerics}
-            required
-            label="Primary number"
-            placeholder=""
+        <div className="h-auto w-full flex justify-start items-center gap-5">
+          <Controller
+            name="phone_number"
+            rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput
+                name=""
+                key="phone_number"
+                onTextInputChange={(val) => onChange(val)}
+                value={value || ""}
+                // inputMode="numeric"
+                onKeyDown={handleOnlyNumerics}
+                required
+                label="Primary number"
+                placeholder=""
+                className="w-4/5"
+              />
+            )}
           />
 
-          <TextInput
-            name=""
-            key="secondary_phone_number"
-            onTextInputChange={(val) =>
-              handleFormChange("secondary_phone_number", val)
-            }
-            value={formData?.secondary_phone_number || ""}
-            // inputMode="numeric"
-            onKeyDown={handleOnlyNumerics}
-            required
-            label="Secondary number"
-            placeholder=""
+          <Controller
+            name="secondary_phone_number"
+            rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextInput
+                name="secondary_phone_number"
+                key="secondary_phone_number"
+                onTextInputChange={(val) =>
+                  onChange(val)
+                }
+                value={value || ""}
+                // inputMode="numeric"
+                error={error?.message}
+                onKeyDown={handleOnlyNumerics}
+                label="Secondary number"
+                placeholder=""
+                className="w-4/5"
+              />
+            )}
           />
         </div>
         <div className="w-full">

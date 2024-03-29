@@ -169,8 +169,9 @@ function List(props: IList) {
 
   return (
     <div
-      className={`relative grid grid-cols-${config.length + 2} w-full items-start justify-center border-2 rounded-md border-[#fbfcfe] h-[200] max-h-[50vh] overflow-y-auto ${className} cursor-pointer hover:[&>img]:block bg-[#fbfcfe]`}
+      className={`relative grid  w-full items-start justify-center border-2 rounded-md border-[#fbfcfe] h-[200] max-h-[50vh] overflow-y-auto ${className} cursor-pointer hover:[&>img]:block bg-[#fbfcfe]`}
       id={id}
+      style={{ gridTemplateColumns: `repeat(${config.length + 2}, 1fr)` }}
     >
       {/* render header with selectable functionality */}
       <div></div>

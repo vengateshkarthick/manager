@@ -15,6 +15,7 @@ function Dropdown({
   size = "md",
   className = " ",
   dropDownClassName = " ",
+  error = " ",
 }: IDropdown) {
   const [selectedOption, setSelectedOption] = useState<
     { id: string; label: string }[]
@@ -87,6 +88,9 @@ function Dropdown({
           size={size}
           noTranistion
         />
+        {error?.length && (
+        <div className="text-sm font-normal w-auto font-[Poppins] text-nowrap">{error}</div>
+      )}
       </div>
 
       {isDropdownOpen && (

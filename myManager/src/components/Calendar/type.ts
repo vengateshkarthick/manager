@@ -3,4 +3,5 @@ export interface ICalendar {
     date: string;
     label: string;
     dontAllowPast?: boolean;
+    error?: string;
   }

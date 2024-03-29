@@ -6,4 +6,5 @@ export interface ITextArea {
     placeholderText?: string;
     label?: string
     height?: number
+    error?: string;
   }

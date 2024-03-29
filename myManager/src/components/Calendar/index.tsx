@@ -1,7 +1,7 @@
 import React from 'react';
 import { ICalendar } from './type';
 
-function CalendarPicker ({ onSelect, date, label, dontAllowPast = true }: ICalendar) {
+function CalendarPicker ({ onSelect, date, label, dontAllowPast = true, error }: ICalendar) {
     const handleChange = (selectedDate:string) => {
      const date = new Date(selectedDate).toISOString().slice(0, 10);
      onSelect(date);
@@ -18,6 +18,7 @@ function CalendarPicker ({ onSelect, date, label, dontAllowPast = true }: ICalen
           min={dontAllowPast ? new Date().toISOString().slice(0, 10) : undefined}
           placeholder='Select Date'
         />
+       { error?.length && <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap">{error}</div>}
       </div>
     )
 }

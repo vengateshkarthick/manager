@@ -10,7 +10,7 @@ import ConfirmationModal from "../../components/Modal";
 import { IListConfig } from "../../components/Table/type";
 
 function EmpList() {
-  const emp = useSelector((state: any) => state?.employee?.emp);
+  const emp = useSelector((state: any) => state?.employee?.emp) as IEmpData[];
   const [empCopy, setempCopy] = React.useState<IEmpData[]>();
   const [selectedId, setSelectedId] = React.useState<string[] | null>(null);
   const [showModal, setShowModal] = React.useState<boolean>(false);

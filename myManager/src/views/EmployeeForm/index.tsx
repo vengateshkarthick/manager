@@ -11,8 +11,7 @@ import Dropdown from "../../components/Dropdown";
 import CalendarPicker from "../../components/Calendar";
 import { team_id, roles } from "../../shared/constants/categories";
 import addProductIcon from "../../assets/formImg.svg";
-import { toast } from "react-toastify";
-import { productKeys } from "../../components/Table/type";
+import { toast } from "react-toastify"
 import { IEmpData } from "../../shared/list.type";
 
 const empDetailsSchema = z
@@ -37,17 +36,6 @@ const empDetailsSchema = z
     message: "The primary phone number and secondary number cannot be the same",
   });
 
-const requiredFields = [
-  "phone_number",
-  "secondary_phone_number",
-  "personal_mail_id",
-  "name",
-  "date_of_joining",
-  "role",
-  "project_id",
-  "team_id",
-];
-
 // TODO: need to configure team_name, project_id and role dropdown properly
 function CreateOrEditEmployee() {
   const { selectedemp } = useSelector((state: any) => state?.employee) as {
@@ -56,19 +44,13 @@ function CreateOrEditEmployee() {
   const {
     handleSubmit,
     formState: { errors, isDirty, isValid },
-    watch,
-    setValue,
     reset,
     control,
     getValues,
   } = useForm<z.infer<typeof empDetailsSchema>>({
     mode: "onSubmit",
     resolver: zodResolver(empDetailsSchema),
-  });
-  const [name, setName] = useState({
-    firstname: "",
-    lastname: "",
-    middlename: "",
+    defaultValues: {},
   });
   const [formData, setFormData] = React.useState<Record<string, any>>({});
   const { id } = useParams();
@@ -98,11 +80,9 @@ function CreateOrEditEmployee() {
       const _roleOpt = roleOptions.find(
         (opt) => opt.id.toLowerCase() === role.toLowerCase()
       );
-      setValue("firstname", firstname, { shouldDirty: false }),
-        setValue("lastname", lastname, { shouldDirty: false }),
-        setValue("middlename", middlename, { shouldDirty: false }),
         reset({
           firstname,
+          middlename,
           lastname,
           role: [_roleOpt],
           team_id: [ctg],
@@ -286,7 +266,7 @@ function CreateOrEditEmployee() {
           />
           {errors?.personal_mail_id?.message && (
             <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap my-1">
-              {errors.personal_mail_id.message}
+              {errors?.personal_mail_id.message}
             </div>
           )}
         </div>
@@ -297,6 +277,7 @@ function CreateOrEditEmployee() {
             </div>
             <Controller
               name="team_id"
+              control={control}
               rules={{ required: true }}
               render={({
                 field: { onChange, value },
@@ -321,6 +302,7 @@ function CreateOrEditEmployee() {
             </div>
             <Controller
               name="role"
+              control={control}
               rules={{ required: true }}
               render={({
                 field: { onChange, value },
@@ -342,6 +324,7 @@ function CreateOrEditEmployee() {
 
           <Controller
             name="date_of_joining"
+            control={control}
             rules={{ required: true }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <CalendarPicker
@@ -356,8 +339,9 @@ function CreateOrEditEmployee() {
 
         <div className="h-auto w-full flex justify-start items-center gap-5">
           <Controller
-            name="phone_number"
+            name="phone_nunber"
             rules={{ required: true }}
+            control={control}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextInput
                 name=""
@@ -368,6 +352,7 @@ function CreateOrEditEmployee() {
                 onKeyDown={handleOnlyNumerics}
                 required
                 label="Primary number"
+                error={error?.message}
                 placeholder=""
                 className="w-4/5"
               />
@@ -376,6 +361,7 @@ function CreateOrEditEmployee() {
 
           <Controller
             name="secondary_phone_number"
+            control={control}
             rules={{ required: true }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextInput
@@ -403,6 +389,7 @@ function CreateOrEditEmployee() {
             variant="filled"
             code="primary"
             className="w-full"
+            disabled={!isValid || !isDirty}
           />
         </div>
       </form>

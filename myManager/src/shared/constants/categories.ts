@@ -20,6 +20,16 @@ export const team_id = [
         id: 'development',
     }
 ]
+export const views = [
+    {
+        id: 'grid',
+        label: 'Grid View',
+    },
+    {
+        id: 'table',
+        label: 'Table View'
+    }
+]
 
 export const roles = [
     {

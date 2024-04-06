@@ -7,6 +7,7 @@ import GridView from './EmployeeView';
 function EmpGridView() {
   const [selectedTeam, setSelectedId] = useState<string>("");
   const emp = useSelector((state: any) => state?.employee?.emp) as IEmpData[];
+  console.log({ emp })
   const [filteredEmp, setFilteredEmp] = useState<IEmpData[]>();
 
 

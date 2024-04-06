@@ -11,7 +11,7 @@ function Dropdown({
   options,
   onSelect,
   isMultiSelect = false,
-  label,
+  label = " ",
   size = "md",
   className = " ",
   dropDownClassName = " ",
@@ -61,7 +61,7 @@ function Dropdown({
     }
   }, [isDropdownOpen]);
 
-  const optionsLabel = selectedOption?.map((item) => item.label);
+  const optionsLabel = selectedOption?.map((item) => item?.label);
 
   // closing the dropdown once clicked outside the component
   useOutsideClickHandler(ref, () => isMultiSelect && setIsDropdownOpen(false));

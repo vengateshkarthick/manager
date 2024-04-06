@@ -39,7 +39,7 @@ function TextArea({
       />
      
     </div>
-    { error?.length ? <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap">{error}</div> : ''}
+    { error?.length ? <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap text-red-500">{error}</div> : ''}
     </div>
   );
 }

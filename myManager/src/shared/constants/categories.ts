@@ -33,31 +33,31 @@ export const views = [
 
 export const roles = [
     {
-        "id": "hr_specialist",
+        "id": "hr specialist",
         "label": "HR Specialist"
     },
     {
-        "id": "financial_analyst",
+        "id": "financial analyst",
         "label": "Financial Analyst"
     },
     {
-        "id": "software_engineer",
+        "id": "software engineer",
         "label": "Software Engineer"
     },
     {
-        "id": "staff_software_engineer",
+        "id": "staff software engineer",
         "label": "Staff Software Engineer"
     },
     {
-        "id": "hr_manager",
+        "id": "hr manager",
         "label": "HR Manager"
     },
     {
-        "id": "ui/ux_designer",
+        "id": "ui/ux designer",
         "label": "UI/UX Designer"
     },
     {
-        "id": "lead_software_engineer",
+        "id": "lead software engineer",
         "label": "Lead Software Engineer"
     }
 ]

@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import dropdown from "../../assets/dropdown.svg";
 import { motion } from "framer-motion";
 import { IEmpData } from "../../shared/list.type";
 import roleImg from "../../assets/role.svg";

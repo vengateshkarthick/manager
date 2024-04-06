@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addemp, fetchempDetails, updateemp } from "../../reducer/store";
 import Button from "../../components/Button";
@@ -11,30 +11,42 @@ import Dropdown from "../../components/Dropdown";
 import CalendarPicker from "../../components/Calendar";
 import { team_id, roles } from "../../shared/constants/categories";
 import addProductIcon from "../../assets/formImg.svg";
-import { toast } from "react-toastify"
+import { toast } from "react-toastify";
 import { IEmpData } from "../../shared/list.type";
 
-const empDetailsSchema = z
-  .object({
-    id: z.string().optional(),
-    phone_nunber: z.string(),
-    personal_mail_id: z.string().email({ message: "Enter a valid email id" }),
-    firstname: z.string().nonempty({ message: "Enter your first name" }),
-    middlename: z.string().optional(),
-    lastname: z.string().optional(),
-    secondary_phone_number: z.string().default("000 000 000"),
-    date_of_joining: z
-      .string()
-      .datetime({ message: "Select a starting date of employee" }),
-    role: z.array(z.object({ id: z.string(), label: z.string() })),
-    team_id: z.array(z.object({ id: z.string(), label: z.string() })),
-    currentEmployee: z.string().default("Yes").optional(),
-    date_of_releving: z.string().datetime().optional(),
-  })
-  .required()
-  .refine((val) => val.secondary_phone_number !== val.phone_nunber, {
-    message: "The primary phone number and secondary number cannot be the same",
-  });
+const empDetailsSchema = z.object({
+  id: z.string().optional(),
+  phone_number: z
+    .string()
+    .nonempty("Enter your phone number")
+    .length(10, "Enter a valid phone number"),
+  personal_mail_id: z
+    .string()
+    .email({ message: "Enter a valid email id" })
+    .nonempty("Enter your personal email id"),
+  firstname: z
+    .string()
+    .nonempty({ message: "Enter your first name" })
+    .max(25, "More than 25 characters are not allowed"),
+  middlename: z
+    .string()
+    .max(25, "More than 25 characters are not allowed")
+    .optional(),
+  lastname: z
+    .string()
+    .max(25, "More than 25 characters are not allowed")
+    .nonempty("Lastname cannot me empty"),
+  secondary_phone_number: z.string().default("000 000 000"),
+  date_of_joining: z.string().optional(),
+  role: z.array(z.object({ id: z.string(), label: z.string() })),
+  team_id: z.array(z.object({ id: z.string(), label: z.string() })),
+  currentEmployee: z.string().default("Yes").optional(),
+  date_of_releving: z.string().optional(),
+});
+// .refine((val) => val.secondary_phone_number === val.phone_number, {
+//   message: "The primary phone number and secondary number cannot be the same",
+//   path: ["secondary_phone_number"]
+// });
 
 // TODO: need to configure team_name, project_id and role dropdown properly
 function CreateOrEditEmployee() {
@@ -47,18 +59,20 @@ function CreateOrEditEmployee() {
     reset,
     control,
     getValues,
+    watch,
+    setError,
   } = useForm<z.infer<typeof empDetailsSchema>>({
-    mode: "onSubmit",
+    mode: "all",
     resolver: zodResolver(empDetailsSchema),
     defaultValues: {},
   });
+
   const [formData, setFormData] = React.useState<Record<string, any>>({});
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const teamOptions = React.useMemo(() => team_id, []);
   const roleOptions = React.useMemo(() => roles, []);
-
   React.useEffect(() => {
     if (id !== "create") {
       dispatch(fetchempDetails(id));
@@ -80,20 +94,20 @@ function CreateOrEditEmployee() {
       const _roleOpt = roleOptions.find(
         (opt) => opt.id.toLowerCase() === role.toLowerCase()
       );
-        reset({
-          firstname,
-          middlename,
-          lastname,
-          role: [_roleOpt],
-          team_id: [ctg],
-          personal_mail_id: rest?.personal_mail_id,
-          phone_nunber: rest?.phone_number,
-          secondary_phone_number: rest?.secondary_phone_number || "000 000 000",
-          date_of_joining: rest?.date_of_joining,
-          currentEmployee: rest?.currentEmployee,
-          date_of_releving: rest?.date_of_reliving,
-          id: rest?.id,
-        });
+      reset({
+        firstname,
+        middlename,
+        lastname,
+        role: [_roleOpt],
+        team_id: [ctg],
+        personal_mail_id: rest?.personal_mail_id,
+        phone_number: rest?.phone_number,
+        secondary_phone_number: rest?.secondary_phone_number || "000 000 000",
+        date_of_joining: rest?.date_of_joining,
+        currentEmployee: rest?.currentEmployee,
+        date_of_releving: rest?.date_of_reliving,
+        id: rest?.id,
+      });
     }
   }, [selectedemp, teamOptions, roleOptions]);
 
@@ -105,19 +119,34 @@ function CreateOrEditEmployee() {
       autoClose: 2000,
     });
     dispatch(addemp(payload));
-    navigate("/home", { replace: true });
+    navigate("/", { replace: true });
   };
 
   const onUpdateEmployee = (payload: any) => {
-    toast("Successfully removed an employee", {
+    toast("Successfully updated employee details", {
       position: "top-right",
       theme: "colored",
       type: "success",
       autoClose: 2000,
     });
     dispatch(updateemp(payload));
-    navigate("/home", { replace: true });
+    navigate("/", { replace: true });
   };
+
+  React.useEffect(() => {
+    if (watch("date_of_joining")) {
+      try {
+        let isValid = z.coerce.string().datetime().parse(watch("date_of_joining"));
+        if (isValid) {
+          setError("date_of_joining", { message: "Enter a valid DOJ" });
+        }
+      }
+      catch {
+        console.log()
+      }
+      
+    }
+  }, [watch("date_of_joining")]);
 
   const createPayload = (_: any) => {
     const values = getValues();
@@ -130,13 +159,11 @@ function CreateOrEditEmployee() {
   };
 
   const onSubmit = () => {
-    if (isValid) {
-      const payload = createPayload(formData);
-      if (id === "create") {
-        onCreateEmployee(payload);
-      } else {
-        onUpdateEmployee(payload);
-      }
+    const payload = createPayload(formData);
+    if (id === "create") {
+      onCreateEmployee(payload);
+    } else {
+      onUpdateEmployee(payload);
     }
   };
 
@@ -155,11 +182,13 @@ function CreateOrEditEmployee() {
   //   handleFormChange("role", role);
   // };
 
+  console.log({ errors, isDirty });
+
   const handleOnlyNumerics: React.KeyboardEventHandler<
     Omit<HTMLInputElement, "date">
   > = (e) => {
     const allowOnlyNum = Array.from(new Array(10), (_, idx) => idx.toString());
-    const allowFunc = ["Backspace", "ArrowLeft", "ArrowRight"];
+    const allowFunc = ["Backspace", "ArrowLeft", "ArrowRight", "+"];
     if (!allowOnlyNum.includes(e.key) && !allowFunc.includes(e.key)) {
       e.preventDefault();
     }
@@ -175,7 +204,7 @@ function CreateOrEditEmployee() {
   };
 
   return (
-    <div className="m-auto h-[80vh] w-[80vw] p-1 flex justify-start items-center border rounded-md border-slate-300">
+    <div className="m-auto h-[80vh] w-[90vw] p-1 flex justify-start items-center border rounded-md border-slate-300">
       <div className="h-full w-[45%]">
         <img src={addProductIcon} alt="add emp" className="h-full w-full" />
       </div>
@@ -186,17 +215,17 @@ function CreateOrEditEmployee() {
         <div className="font-normal text-left text-xl font-[Poppins]">
           {id !== "create" ? "Edit the emp details..." : "Add new employee..."}
         </div>
-        <div className="flex justify-start items-center gap-4">
+        <div className="flex h-auto justify-start items-start gap-4">
           <Controller
             name="firstname"
             control={control}
             rules={{ required: true }}
-            render={({ field: { value, onChange }, fieldState: { error } }) => (
+            render={({ field: { value, onChange } }) => (
               <TextInput
                 name="firstname"
                 key="firstname"
                 onTextInputChange={(val) => onChange(val)}
-                error={error?.message}
+                error={errors?.firstname?.message}
                 value={value || ""}
                 required
                 className="w-4/5"
@@ -209,14 +238,13 @@ function CreateOrEditEmployee() {
           <Controller
             name="middlename"
             control={control}
-            render={({ field: { value, onChange }, fieldState: { error } }) => (
+            render={({ field: { value, onChange } }) => (
               <TextInput
                 name="middlename"
                 key="middlename"
                 onTextInputChange={(val) => onChange(val)}
-                error={error?.message}
+                error={errors?.middlename?.message}
                 value={value || ""}
-                required
                 className="w-4/5"
                 placeholder=" "
                 label="Middle Name"
@@ -228,12 +256,12 @@ function CreateOrEditEmployee() {
             name="lastname"
             control={control}
             rules={{ required: true }}
-            render={({ field: { value, onChange }, fieldState: { error } }) => (
+            render={({ field: { value, onChange } }) => (
               <TextInput
                 name="lastname"
                 key="lasttname"
                 onTextInputChange={(val) => onChange(val)}
-                error={error?.message}
+                error={errors?.lastname?.message}
                 value={value || ""}
                 required
                 className="w-4/5"
@@ -265,7 +293,7 @@ function CreateOrEditEmployee() {
             )}
           />
           {errors?.personal_mail_id?.message && (
-            <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap my-1">
+            <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap my-1 text-red-500">
               {errors?.personal_mail_id.message}
             </div>
           )}
@@ -279,10 +307,7 @@ function CreateOrEditEmployee() {
               name="team_id"
               control={control}
               rules={{ required: true }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value } }) => (
                 <Dropdown
                   onSelect={(opt) => onChange(opt)}
                   options={teamOptions}
@@ -291,7 +316,7 @@ function CreateOrEditEmployee() {
                   size="sm"
                   isMultiSelect={false}
                   dropDownClassName="w-[500px]"
-                  error={error?.message}
+                  error={errors?.team_id?.message}
                 />
               )}
             />
@@ -304,19 +329,16 @@ function CreateOrEditEmployee() {
               name="role"
               control={control}
               rules={{ required: true }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value } }) => (
                 <Dropdown
                   onSelect={(opt) => onChange(opt)}
-                  options={teamOptions}
+                  options={roles}
                   selected={value || []}
                   key="role"
                   size="sm"
                   isMultiSelect={false}
                   dropDownClassName="w-[500px]"
-                  error={error?.message}
+                  error={errors?.role?.message}
                 />
               )}
             />
@@ -326,12 +348,15 @@ function CreateOrEditEmployee() {
             name="date_of_joining"
             control={control}
             rules={{ required: true }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
+            render={({ field: { onChange, value } }) => (
               <CalendarPicker
-                date={value}
-                onSelect={(date) => onChange(date)}
+                date={value as string}
+                onSelect={(date) => {
+                  onChange(date);
+                }}
                 label="Date of Joining"
-                error={error?.message}
+                error={errors.date_of_joining?.message}
+                allowPast
               />
             )}
           />
@@ -339,10 +364,10 @@ function CreateOrEditEmployee() {
 
         <div className="h-auto w-full flex justify-start items-center gap-5">
           <Controller
-            name="phone_nunber"
+            name="phone_number"
             rules={{ required: true }}
             control={control}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
+            render={({ field: { onChange, value } }) => (
               <TextInput
                 name=""
                 key="phone_number"
@@ -352,7 +377,7 @@ function CreateOrEditEmployee() {
                 onKeyDown={handleOnlyNumerics}
                 required
                 label="Primary number"
-                error={error?.message}
+                error={errors?.phone_number?.message}
                 placeholder=""
                 className="w-4/5"
               />
@@ -363,16 +388,16 @@ function CreateOrEditEmployee() {
             name="secondary_phone_number"
             control={control}
             rules={{ required: true }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
+            render={({ field: { onChange, value } }) => (
               <TextInput
                 name="secondary_phone_number"
                 key="secondary_phone_number"
-                onTextInputChange={(val) =>
-                  onChange(val)
-                }
+                onTextInputChange={(val) => onChange(val)}
                 value={value || ""}
                 // inputMode="numeric"
-                error={error?.message}
+                error={
+                  errors.root?.message || errors.secondary_phone_number?.message
+                }
                 onKeyDown={handleOnlyNumerics}
                 label="Secondary number"
                 placeholder=""
@@ -389,7 +414,7 @@ function CreateOrEditEmployee() {
             variant="filled"
             code="primary"
             className="w-full"
-            disabled={!isValid || !isDirty}
+            disabled={!!Object.keys(errors).length || !isDirty}
           />
         </div>
       </form>

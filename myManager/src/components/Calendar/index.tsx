@@ -1,10 +1,11 @@
 import React from 'react';
 import { ICalendar } from './type';
 
-function CalendarPicker ({ onSelect, date, label, dontAllowPast = true, error }: ICalendar) {
+function CalendarPicker ({ onSelect, date, label, allowPast = true, error }: ICalendar) {
+    
+
     const handleChange = (selectedDate:string) => {
-     const date = new Date(selectedDate).toISOString().slice(0, 10);
-     onSelect(date);
+     onSelect(new Date(selectedDate).toISOString());
     }
     return (
       <div className="w-auto h-auto flex flex-col gap-2 justify-center items-start">
@@ -14,11 +15,13 @@ function CalendarPicker ({ onSelect, date, label, dontAllowPast = true, error }:
           id="date-calendar"
           className="p-3 font-[Poppins] border text-sm rounded border-neutral-300 cursor-pointer outline-none focus:border-2  focus:border-blue-700"
           onChange={e => handleChange(e.target.value)}
-          value={date}
-          min={dontAllowPast ? new Date().toISOString().slice(0, 10) : undefined}
+          value={date?.slice(0,10)}
+          min={"1990-01-01"}
+          
+         
           placeholder='Select Date'
         />
-       { error?.length && <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap">{error}</div>}
+       { error?.length && <div className="col-span-1 text-sm font-normal font-[Poppins] text-nowrap text-red-500">{error}</div>}
       </div>
     )
 }

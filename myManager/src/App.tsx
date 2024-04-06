@@ -7,6 +7,7 @@ import CreateOrEditEmployee from "./views/EmployeeForm";
 import { setInitialempList } from "./reducer/store";
 import { getApiData } from "./views/EmployeeList/helper";
 import Header from "./components/Header";
+import EmpGridView from "./views/EmpolyeeGrid";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,6 +40,10 @@ const routes = createBrowserRouter([
         path: "form/:id",
         element: <CreateOrEditEmployee />,
       },
+      {
+        path: '/grid-view',
+        element: <EmpGridView />
+      }
     ],
   },
 ]);

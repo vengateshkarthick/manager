@@ -7,7 +7,8 @@ Core Components:
   4. Custom Button
   5. Searchable Dropdown
   6. Custom Calendar
-  7. Drag and Drop 
+  7. Drag and Drop
+  8. Tag
 
      
 External libraries Covered

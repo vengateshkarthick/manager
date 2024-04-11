@@ -5,6 +5,9 @@ Core Components:
   2. Search Input
   3. Custom Table with sorting and delete records
   4. Custom Button
+  5. Searchable Dropdown
+  6. Custom Calendar
+  7. Drag and Drop 
 
      
 External libraries Covered
@@ -12,5 +15,6 @@ External libraries Covered
    2. react-router v6  for rout handling
    3. tailwindcss for styling
    4. redux, redux-toolkit for global state management
+   5. Zustand for calendar store
       
      

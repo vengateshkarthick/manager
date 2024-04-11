@@ -5,6 +5,8 @@ Core Components:
   2. Search Input
   3. Custom Table with sorting and delete records
   4. Custom Button
+
+     
 External libraries Covered
    1. Zod for JSON schema validating
    2. react-router v6  for rout handling

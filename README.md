@@ -9,6 +9,8 @@ Core Components:
   6. Custom Calendar
   7. Drag and Drop
   8. Tag
+  9. Timeline
+  10. Rich Text editor
 
      
 External libraries Covered
